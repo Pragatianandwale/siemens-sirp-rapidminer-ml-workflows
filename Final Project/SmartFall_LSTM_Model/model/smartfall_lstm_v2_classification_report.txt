@@ -1,0 +1,15 @@
+Accuracy: 0.6889 (68.89%)
+Macro precision: 0.5855
+Macro recall: 0.5240
+Macro F1: 0.5321
+
+                  precision    recall  f1-score   support
+
+   gradual_drift       0.52      0.85      0.65        13
+          stable       0.82      0.56      0.67        16
+   sudden_change       1.00      0.69      0.81        16
+temporary_change       0.00      0.00      0.00         0
+
+        accuracy                           0.69        45
+       macro avg       0.59      0.52      0.53        45
+    weighted avg       0.80      0.69      0.71        45

@@ -1,0 +1,5 @@
+,gradual_drift,stable,sudden_change,temporary_change
+gradual_drift,10,0,3,0
+stable,3,0,0,2
+sudden_change,0,0,14,9
+temporary_change,12,0,0,1

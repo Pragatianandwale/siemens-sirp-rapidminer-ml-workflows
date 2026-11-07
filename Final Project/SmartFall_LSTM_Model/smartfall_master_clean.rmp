@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><process version="12.1.001">
+  <context>
+    <input/>
+    <output/>
+    <macros/>
+  </context>
+  <operator activated="true" class="process" compatibility="12.1.001" expanded="true" name="Process">
+    <parameter key="logverbosity" value="init"/>
+    <parameter key="random_seed" value="2001"/>
+    <parameter key="send_mail" value="never"/>
+    <parameter key="notification_email" value=""/>
+    <parameter key="process_duration_for_mail" value="30"/>
+    <parameter key="encoding" value="SYSTEM"/>
+    <process expanded="true">
+      <operator activated="true" class="read_csv" compatibility="12.1.001" expanded="true" height="68" name="Read CSV" width="90" x="45" y="34">
+        <parameter key="csv_file" value="C:\Users\PRAGATI\Desktop\SmartFall_LSTM_Model\model\smartfall_lstm_v2_predictions.csv"/>
+        <parameter key="column_separators" value=","/>
+        <parameter key="trim_lines" value="false"/>
+        <parameter key="multiline_text" value="false"/>
+        <parameter key="use_quotes" value="true"/>
+        <parameter key="quotes_character" value="&quot;"/>
+        <parameter key="escape_character" value="\"/>
+        <parameter key="skip_comments" value="true"/>
+        <parameter key="comment_characters" value="#"/>
+        <parameter key="starting_row" value="1"/>
+        <parameter key="parse_numbers" value="true"/>
+        <parameter key="decimal_character" value="."/>
+        <parameter key="grouped_digits" value="false"/>
+        <parameter key="grouping_character" value=","/>
+        <parameter key="infinity_representation" value=""/>
+        <parameter key="date_format" value=""/>
+        <parameter key="use_header_row" value="true"/>
+        <parameter key="header_row" value="1"/>
+        <parameter key="first_row_as_names" value="true"/>
+        <list key="annotations"/>
+        <parameter key="time_zone" value="Asia/Calcutta"/>
+        <parameter key="locale" value="English (United States)"/>
+        <parameter key="encoding" value="windows-1252"/>
+        <parameter key="read_all_values_as_polynominal" value="false"/>
+        <list key="data_set_meta_data_information">
+          <parameter key="0" value="person_id.true.polynominal.attribute"/>
+          <parameter key="1" value="sequence_end_day.true.integer.attribute"/>
+          <parameter key="2" value="actual_label.true.polynominal.attribute"/>
+          <parameter key="3" value="predicted_label.true.polynominal.attribute"/>
+          <parameter key="4" value="probability_gradual_drift.true.real.attribute"/>
+          <parameter key="5" value="probability_stable.true.real.attribute"/>
+          <parameter key="6" value="probability_sudden_change.true.real.attribute"/>
+          <parameter key="7" value="probability_temporary_change.true.real.attribute"/>
+        </list>
+        <parameter key="read_not_matching_values_as_missings" value="false"/>
+      </operator>
+      <operator activated="true" class="blending:sort" compatibility="12.1.001" expanded="true" height="82" name="Sort" width="90" x="179" y="34">
+        <list key="sort_by">
+          <parameter key="person_id" value="ascending"/>
+          <parameter key="sequence_end_day" value="ascending"/>
+        </list>
+      </operator>
+      <operator activated="true" class="blending:generate_id" compatibility="12.1.001" expanded="true" height="82" name="Generate ID" width="90" x="313" y="34">
+        <parameter key="create_nominal_ids" value="false"/>
+        <parameter key="offset" value="0"/>
+      </operator>
+      <operator activated="true" class="blending:rename" compatibility="12.1.001" expanded="true" height="82" name="Rename" width="90" x="447" y="34">
+        <list key="rename attributes">
+          <parameter key="id" value="row_no"/>
+        </list>
+        <parameter key="from_attribute" value=""/>
+        <parameter key="to_attribute" value=""/>
+      </operator>
+      <operator activated="true" class="blending:set_role" compatibility="12.1.001" expanded="true" height="82" name="Set Role" width="90" x="581" y="34">
+        <list key="set_roles">
+          <parameter key="row_no" value="regular"/>
+        </list>
+      </operator>
+      <operator activated="true" class="blending:generate_columns" compatibility="12.1.001" expanded="true" height="82" name="Generate Attributes" width="90" x="715" y="34">
+        <list key="function_descriptions">
+          <parameter key="lstm_correct" value="if(actual_label==predicted_label,1,0)"/>
+          <parameter key="deviation_score" value="round((1 - probability_stable)*10000)/10000"/>
+          <parameter key="confidence" value="round(max(probability_gradual_drift, probability_stable, probability_sudden_change, probability_temporary_change)*10000)/10000"/>
+          <parameter key="high_flag" value="if(deviation_score &gt;= 0.5,1,0)"/>
+        </list>
+        <parameter key="keep_all_columns" value="true"/>
+        <parameter key="default_time_zone" value="Asia/Calcutta"/>
+      </operator>
+      <operator activated="true" class="multiply" compatibility="12.1.001" expanded="true" height="124" name="Multiply" width="90" x="849" y="34"/>
+      <operator activated="true" class="subprocess" compatibility="12.1.001" expanded="true" height="82" name="Subprocess (2)" width="90" x="1050" y="136">
+        <process expanded="true">
+          <operator activated="true" class="blending:select_attributes" compatibility="12.1.001" expanded="true" height="82" name="Select Attributes (3)" width="90" x="45" y="34">
+            <parameter key="type" value="include attributes"/>
+            <parameter key="attribute_filter_type" value="regular expression"/>
+            <parameter key="select_attribute" value=""/>
+            <parameter key="select_subset" value=""/>
+            <parameter key="expression" value="person_id|row_no|deviation_score|high_flag"/>
+            <parameter key="also_apply_to_special_attributes_(id,_label..)" value="false"/>
+          </operator>
+          <operator activated="true" class="blending:generate_columns" compatibility="12.1.001" expanded="true" height="82" name="Generate Attributes (3)" width="90" x="179" y="34">
+            <list key="function_descriptions">
+              <parameter key="lag_key2" value="row_no + 2"/>
+            </list>
+            <parameter key="keep_all_columns" value="true"/>
+            <parameter key="default_time_zone" value="Asia/Calcutta"/>
+          </operator>
+          <operator activated="true" class="blending:select_attributes" compatibility="12.1.001" expanded="true" height="82" name="Select Attributes (4)" width="90" x="313" y="34">
+            <parameter key="type" value="exclude attributes"/>
+            <parameter key="attribute_filter_type" value="one attribute"/>
+            <parameter key="select_attribute" value="row_no"/>
+            <parameter key="select_subset" value=""/>
+            <parameter key="also_apply_to_special_attributes_(id,_label..)" value="false"/>
+          </operator>
+          <operator activated="true" class="blending:rename" compatibility="12.1.001" expanded="true" height="82" name="Rename (3)" width="90" x="447" y="34">
+            <list key="rename attributes">
+              <parameter key="deviation_score" value="dev_lag2"/>
+              <parameter key="high_flag" value="hi_lag2"/>
+            </list>
+            <parameter key="from_attribute" value=""/>
+            <parameter key="to_attribute" value=""/>
+          </operator>
+          <connect from_port="in 1" to_op="Select Attributes (3)" to_port="example set input"/>
+          <connect from_op="Select Attributes (3)" from_port="example set output" to_op="Generate Attributes (3)" to_port="table input"/>
+          <connect from_op="Generate Attributes (3)" from_port="table output" to_op="Select Attributes (4)" to_port="example set input"/>
+          <connect from_op="Select Attributes (4)" from_port="example set output" to_op="Rename (3)" to_port="example set input"/>
+          <connect from_op="Rename (3)" from_port="example set output" to_port="out 1"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="subprocess" compatibility="12.1.001" expanded="true" height="82" name="Subprocess" width="90" x="1050" y="34">
+        <process expanded="true">
+          <operator activated="true" class="blending:select_attributes" compatibility="12.1.001" expanded="true" height="82" name="Select Attributes" width="90" x="45" y="34">
+            <parameter key="type" value="include attributes"/>
+            <parameter key="attribute_filter_type" value="regular expression"/>
+            <parameter key="select_attribute" value=""/>
+            <parameter key="select_subset" value=""/>
+            <parameter key="expression" value="person_id|row_no|sequence_end_day|deviation_score|high_flag"/>
+            <parameter key="also_apply_to_special_attributes_(id,_label..)" value="true"/>
+          </operator>
+          <operator activated="true" class="blending:generate_columns" compatibility="12.1.001" expanded="true" height="82" name="Generate Attributes (2)" width="90" x="179" y="34">
+            <list key="function_descriptions">
+              <parameter key="lag_key1" value="row_no + 1"/>
+            </list>
+            <parameter key="keep_all_columns" value="true"/>
+            <parameter key="default_time_zone" value="Asia/Calcutta"/>
+          </operator>
+          <operator activated="true" class="blending:select_attributes" compatibility="12.1.001" expanded="true" height="82" name="Select Attributes (2)" width="90" x="313" y="34">
+            <parameter key="type" value="exclude attributes"/>
+            <parameter key="attribute_filter_type" value="one attribute"/>
+            <parameter key="select_attribute" value="row_no"/>
+            <parameter key="select_subset" value=""/>
+            <parameter key="also_apply_to_special_attributes_(id,_label..)" value="false"/>
+          </operator>
+          <operator activated="true" class="blending:rename" compatibility="12.1.001" expanded="true" height="82" name="Rename (2)" width="90" x="447" y="34">
+            <list key="rename attributes">
+              <parameter key="sequence_end_day" value="prev_day"/>
+              <parameter key="deviation_score" value="dev_lag1"/>
+              <parameter key="high_flag" value="hi_lag1"/>
+            </list>
+            <parameter key="from_attribute" value=""/>
+            <parameter key="to_attribute" value=""/>
+          </operator>
+          <connect from_port="in 1" to_op="Select Attributes" to_port="example set input"/>
+          <connect from_op="Select Attributes" from_port="example set output" to_op="Generate Attributes (2)" to_port="table input"/>
+          <connect from_op="Generate Attributes (2)" from_port="table output" to_op="Select Attributes (2)" to_port="example set input"/>
+          <connect from_op="Select Attributes (2)" from_port="example set output" to_op="Rename (2)" to_port="example set input"/>
+          <connect from_op="Rename (2)" from_port="example set output" to_port="out 1"/>
+          <portSpacing port="source_in 1" spacing="0"/>
+          <portSpacing port="source_in 2" spacing="0"/>
+          <portSpacing port="sink_out 1" spacing="0"/>
+          <portSpacing port="sink_out 2" spacing="0"/>
+        </process>
+      </operator>
+      <operator activated="true" class="concurrency:join" compatibility="12.1.001" expanded="true" height="82" name="Join" width="90" x="916" y="238">
+        <parameter key="remove_double_attributes" value="true"/>
+        <parameter key="join_type" value="left"/>
+        <parameter key="use_id_attribute_as_key" value="false"/>
+        <list key="key_attributes">
+          <parameter key="person_id" value="person_id"/>
+          <parameter key="row_no" value="lag_key1"/>
+        </list>
+        <parameter key="keep_both_join_attributes" value="false"/>
+      </operator>
+      <operator activated="true" class="concurrency:join" compatibility="12.1.001" expanded="true" height="82" name="Join (2)" width="90" x="1050" y="238">
+        <parameter key="remove_double_attributes" value="true"/>
+        <parameter key="join_type" value="left"/>
+        <parameter key="use_id_attribute_as_key" value="false"/>
+        <list key="key_attributes">
+          <parameter key="person_id" value="person_id"/>
+          <parameter key="row_no" value="lag_key2"/>
+        </list>
+        <parameter key="keep_both_join_attributes" value="false"/>
+      </operator>
+      <operator activated="true" class="blending:generate_columns" compatibility="12.1.001" expanded="true" height="82" name="Generate Attributes (4)" width="90" x="1184" y="238">
+        <list key="function_descriptions">
+          <parameter key="days_since_prev_seq" value="if(missing(prev_day),0,sequence_end_day-prev_day)"/>
+          <parameter key="dev_trend" value="if(missing(dev_lag1),0,round((deviation_score-dev_lag1)*10000)/10000)"/>
+          <parameter key="dev_roll3" value="round(if(missing(dev_lag2),if(missing(dev_lag1),deviation_score,(deviation_score+dev_lag1)/2),(deviation_score+dev_lag1+dev_lag2)/3)*10000)/10000"/>
+          <parameter key="consec_high" value="if(high_flag==0,0,if(missing(hi_lag1) || hi_lag1==0,1,if(missing(hi_lag2) || hi_lag2==0,2,3)))"/>
+          <parameter key="persistent_deviation" value="if(consec_high&gt;=2,1,0)"/>
+        </list>
+        <parameter key="keep_all_columns" value="true"/>
+        <parameter key="default_time_zone" value="Asia/Calcutta"/>
+      </operator>
+      <operator activated="true" class="store" compatibility="12.1.001" expanded="true" height="68" name="Store" width="90" x="1318" y="238">
+        <parameter key="repository_entry" value="../data/spine_features"/>
+      </operator>
+      <connect from_op="Read CSV" from_port="output" to_op="Sort" to_port="example set input"/>
+      <connect from_op="Sort" from_port="example set output" to_op="Generate ID" to_port="example set input"/>
+      <connect from_op="Generate ID" from_port="example set output" to_op="Rename" to_port="example set input"/>
+      <connect from_op="Rename" from_port="example set output" to_op="Set Role" to_port="example set input"/>
+      <connect from_op="Set Role" from_port="example set output" to_op="Generate Attributes" to_port="table input"/>
+      <connect from_op="Generate Attributes" from_port="table output" to_op="Multiply" to_port="input"/>
+      <connect from_op="Multiply" from_port="output 1" to_op="Subprocess" to_port="in 1"/>
+      <connect from_op="Multiply" from_port="output 2" to_op="Subprocess (2)" to_port="in 1"/>
+      <connect from_op="Multiply" from_port="output 3" to_op="Join" to_port="left"/>
+      <connect from_op="Subprocess (2)" from_port="out 1" to_op="Join (2)" to_port="right"/>
+      <connect from_op="Subprocess" from_port="out 1" to_op="Join" to_port="right"/>
+      <connect from_op="Join" from_port="join" to_op="Join (2)" to_port="left"/>
+      <connect from_op="Join (2)" from_port="join" to_op="Generate Attributes (4)" to_port="table input"/>
+      <connect from_op="Generate Attributes (4)" from_port="table output" to_op="Store" to_port="input"/>
+      <connect from_op="Store" from_port="through" to_port="result 1"/>
+      <portSpacing port="source_input 1" spacing="0"/>
+      <portSpacing port="sink_result 1" spacing="0"/>
+      <portSpacing port="sink_result 2" spacing="0"/>
+    </process>
+  </operator>
+</process>

@@ -1,0 +1,57 @@
+{
+  "dataset_path": "C:\\Users\\PRAGATI\\Desktop\\SmartFall_LSTM_Model\\data\\smartfall_rnn_clean_ready_to_use.csv",
+  "output_directory": "C:\\Users\\PRAGATI\\Desktop\\SmartFall_LSTM_Model\\model",
+  "sequence_length": 5,
+  "features": [
+    "gait_speed",
+    "step_time_variability",
+    "turn_duration",
+    "sway_rms",
+    "accel_rms"
+  ],
+  "classes": [
+    "gradual_drift",
+    "stable",
+    "sudden_change",
+    "temporary_change"
+  ],
+  "rows_after_cleaning": 293,
+  "participants": 24,
+  "sequences": 177,
+  "train_sequences": 93,
+  "validation_sequences": 39,
+  "test_sequences": 45,
+  "train_participants": [
+    "P03",
+    "P04",
+    "P05",
+    "P07",
+    "P08",
+    "P10",
+    "P12",
+    "P16",
+    "P19",
+    "P20",
+    "P22",
+    "P23"
+  ],
+  "validation_participants": [
+    "P11",
+    "P14",
+    "P21",
+    "P24"
+  ],
+  "test_participants": [
+    "P01",
+    "P02",
+    "P06",
+    "P09",
+    "P15",
+    "P17"
+  ],
+  "test_accuracy": 0.6888888888888889,
+  "macro_precision": 0.5854978354978355,
+  "macro_recall": 0.5240384615384616,
+  "macro_f1": 0.5321350762527233,
+  "note": "If the dataset is synthetic, results do not establish real-world clinical performance."
+}
